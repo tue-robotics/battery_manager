@@ -1,8 +1,8 @@
 <launch>
 
-  <rosparam file="$(find amigo_battery_manager_dev)/parameters/parameters.yaml" command="load" />
+  <rosparam file="$(find amigo_battery_manager)/parameters/parameters.yaml" command="load" />
 
-  <node pkg="amigo_battery_manager_dev" type="battery_manager" respawn="false" name="battery_manager" output="screen">
+  <node pkg="amigo_battery_manager" type="battery_manager" respawn="false" name="battery_manager" output="screen">
   </node>
   
 </launch>
