@@ -18,10 +18,10 @@ void batteryCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
 	ROS_DEBUG("Battery value: %f", msg->values[0]);
 	
 	if (msg->values[0] < low_power_margin_ch1) {
-		alarm_msg.data = string("Power too low on channel one");
+		alarm_msg.data = string("Battery low");
 		alarm_state = true;
 	} else if (msg->values[0] > high_power_margin_ch1) {
-		alarm_msg.data = string("Power too high on channel one");
+		alarm_msg.data = string("Power too high");
 		alarm_state = true;
 	} else {
 		alarm_msg.data = "";
