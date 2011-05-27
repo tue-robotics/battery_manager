@@ -1,6 +1,6 @@
 battery_manager:
   low_power_margin_ch1: 7.0
-  high_power_margin_ch1: 8.0 
+  high_power_margin_ch1: 9.0 
   low_power_margin_ch2: 7.0
   high_power_margin_ch2: 8.0
   nominal_power: 7.5
