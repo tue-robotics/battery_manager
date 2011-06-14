@@ -7,7 +7,7 @@
   <author>Sava</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/amigo_battery_manager_dev</url>
+  <url>http://ros.org/wiki/amigo_battery_manager</url>
 	<depend package="roscpp"/>
     <depend package="amigo_msgs"/>
     <depend package="std_msgs"/>
