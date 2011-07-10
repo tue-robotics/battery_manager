@@ -1,11 +1,14 @@
 #include "ros/ros.h"
 #include <soem_beckhoff_drivers/AnalogMsg.h>
 #include <std_msgs/String.h>
+#include <diagnostic_updater/DiagnosticStatusWrapper.h>
+#include <diagnostic_msgs/DiagnosticArray.h>
 
 using namespace std;
 
 ros::Time time_init, time_current;
 ros::Publisher pub;
+ros::Publisher diag_pub;
 ros::Subscriber sub;
 int alarm_count = 0, max_alarms;
 bool alarm_state = false;
@@ -15,18 +18,33 @@ std_msgs::String alarm_msg;
 
 void batteryCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
 {
+    vector<diagnostic_msgs::DiagnosticStatus> statuses;
+    diagnostic_updater::DiagnosticStatusWrapper status;
+
+    status.addf("Battery level", "%f", msg->values[0]*conversion_factor);
+
+    status.name = "Battery";
+
+
+
 	ROS_DEBUG("Battery value: %f", msg->values[0]);
 	
 	if (msg->values[0] < low_power_margin_ch1) {
 		alarm_msg.data = string("Battery low");
 		alarm_state = true;
+		status.level = 1;
+		status.message = "Battery low";
+
 	} else if (msg->values[0] > high_power_margin_ch1) {
 		alarm_msg.data = string("Power too high");
 		alarm_state = true;
+		status.level = 1;
+		status.message = "Power too high";
 	} else {
 		alarm_msg.data = "";
 		alarm_state = false;
 		alarm_count = 0;	
+		status.level = 0;
 	}
 	
 	if (alarm_state) {
@@ -46,6 +64,15 @@ void batteryCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
 		alarm_state = false;
 		alarm_msg.data = "";
 	}
+
+
+    statuses.push_back(status);
+
+    diagnostic_msgs::DiagnosticArray diag_msg;
+    diag_msg.status = statuses;
+    diag_msg.header.stamp = ros::Time::now();
+
+    diag_pub.publish(diag_msg);
 }
 
 int main(int argc, char **argv)
@@ -64,6 +91,7 @@ int main(int argc, char **argv)
 	
 	sub = n.subscribe("/battery", 1000, batteryCallback);
 	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
+	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 	
 	time_init = ros::Time::now();	
 	

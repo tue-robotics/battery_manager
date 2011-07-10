@@ -11,7 +11,7 @@ int main(int argc, char** argv){
   
   msg.values.resize(2);
   
-	msg.values[0] = 6;
+	msg.values[0] = 7.5;
 	msg.values[1] = 0.0;
 
   ros::Rate rate(1.0);
