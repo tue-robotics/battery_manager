@@ -22,10 +22,10 @@ void digitalCallback(const soem_beckhoff_drivers::DigitalMsg::ConstPtr& msg)
 	   vector<diagnostic_msgs::DiagnosticStatus> statuses;
 	    diagnostic_updater::DiagnosticStatusWrapper status;
 
-	    status.addf("Fuse RB", "%b", msg->values[0]);
-	    status.addf("Fuse RF", "%b", msg->values[1]);
-	    status.addf("Fuse LF", "%b", msg->values[2]);
-	    status.addf("Fuse LB", "%b", msg->values[3]);
+	    status.addf("Power RB", "%b", msg->values[0]);
+	    status.addf("Power RF", "%b", msg->values[1]);
+	    status.addf("Power LF", "%b", msg->values[2]);
+	    status.addf("Power LB", "%b", msg->values[3]);
 
 	    status.name = "Battery";
 
