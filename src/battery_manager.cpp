@@ -23,21 +23,37 @@ void digitalCallback(const soem_beckhoff_drivers::DigitalMsg::ConstPtr& msg)
 	diagnostic_updater::DiagnosticStatusWrapper status;
 
 	if (msg->values[0])
-		status.addf("Power RB", "no");
+	{
+		status.addf("Fuse RB", "broken");
+		status.level = 0;
+		status.message = "Fuse broken";
+	}
 	else
-		status.addf("Power RB", "yes");
+		status.addf("Fuse RB", "correct");
 	if (msg->values[1])
-			status.addf("Power RF", "no");
-		else
-			status.addf("Power RF", "yes");
+	{
+		status.addf("Fuse RF", "broken");
+		status.level = 0;
+		status.message = "Fuse broken";
+	}
+	else
+		status.addf("Fuse RF", "correct");
 	if (msg->values[2])
-			status.addf("Power LF", "no");
-		else
-			status.addf("Power LF", "yes");
+	{
+		status.addf("Fuse LF", "broken");
+		status.level = 0;
+		status.message = "Fuse broken";
+	}
+	else
+		status.addf("Fuse LF", "correct");
 	if (msg->values[3])
-			status.addf("Power LB", "no");
-		else
-			status.addf("Power LB", "yes");
+	{
+		status.addf("Fuse LB", "broken");
+		status.level = 0;
+		status.message = "Fuse broken";
+	}
+	else
+		status.addf("Fuse LB", "correct");
 
 	status.name = "Battery";
 
