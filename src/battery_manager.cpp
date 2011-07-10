@@ -89,7 +89,7 @@ int main(int argc, char **argv)
 	n.param<double> ("/battery_manager/alarm_period", alarm_period, 10.0);
 	n.param<int> ("/battery_manager/max_alarms", max_alarms, 3);
 	
-	sub = n.subscribe("/battery", 1000, batteryCallback);
+	sub = n.subscribe("/analog_in", 1000, batteryCallback);
 	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 	
