@@ -1,5 +1,6 @@
 #include "ros/ros.h"
 #include <soem_beckhoff_drivers/AnalogMsg.h>
+#include <soem_beckhoff_drivers/DigitalMsg.h>
 #include <std_msgs/String.h>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
@@ -9,14 +10,36 @@ using namespace std;
 ros::Time time_init, time_current;
 ros::Publisher pub;
 ros::Publisher diag_pub;
-ros::Subscriber sub;
+ros::Subscriber analog_sub;
+ros::Subscriber digital_sub;
 int alarm_count = 0, max_alarms;
 bool alarm_state = false;
 double low_power_margin_ch1, high_power_margin_ch1, low_power_margin_ch2, high_power_margin_ch2, nominal_power, conversion_factor, alarm_period;
 std_msgs::String alarm_msg;
 
+void digitalCallback(const soem_beckhoff_drivers::DigitalMsg::ConstPtr& msg)
+{
+	   vector<diagnostic_msgs::DiagnosticStatus> statuses;
+	    diagnostic_updater::DiagnosticStatusWrapper status;
 
-void batteryCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
+	    status.addf("Fuse RB", "%b", msg->values[0]);
+	    status.addf("Fuse RF", "%b", msg->values[1]);
+	    status.addf("Fuse LF", "%b", msg->values[2]);
+	    status.addf("Fuse LB", "%b", msg->values[3]);
+
+	    status.name = "Battery";
+
+		status.level = 0;
+
+	    statuses.push_back(status);
+
+	    diagnostic_msgs::DiagnosticArray diag_msg;
+	    diag_msg.status = statuses;
+	    diag_msg.header.stamp = ros::Time::now();
+
+	    diag_pub.publish(diag_msg);
+}
+void analogCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
 {
     vector<diagnostic_msgs::DiagnosticStatus> statuses;
     diagnostic_updater::DiagnosticStatusWrapper status;
@@ -89,7 +112,8 @@ int main(int argc, char **argv)
 	n.param<double> ("/battery_manager/alarm_period", alarm_period, 10.0);
 	n.param<int> ("/battery_manager/max_alarms", max_alarms, 3);
 	
-	sub = n.subscribe("/analog_in", 1000, batteryCallback);
+	analog_sub = n.subscribe("/analog_in", 1000, analogCallback);
+	digital_sub = n.subscribe("/digital_in", 1000, digitalCallback);
 	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 	
