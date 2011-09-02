@@ -13,6 +13,7 @@
     <depend package="std_msgs"/>
     <depend package="soem_beckhoff_drivers"/>
     <depend package="diagnostic_updater"/>
+    <depend package="pr2_msgs"/>
 </package>
 
 

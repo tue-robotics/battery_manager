@@ -1,163 +1,152 @@
 #include "ros/ros.h"
-#include <soem_beckhoff_drivers/AnalogMsg.h>
-#include <soem_beckhoff_drivers/DigitalMsg.h>
-#include <std_msgs/String.h>
+#include <std_msgs/Float32.h>
+#include <std_msgs/Bool.h>
+#include <pr2_msgs/PowerState.h>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
 
 using namespace std;
 
 ros::Time time_init, time_current;
-ros::Publisher pub;
+ros::Publisher power_pub;
 ros::Publisher diag_pub;
-ros::Subscriber analog_sub;
-ros::Subscriber digital_sub;
-int alarm_count = 0, max_alarms;
-bool alarm_state = false;
-double low_power_margin_ch1, high_power_margin_ch1, low_power_margin_ch2, high_power_margin_ch2, nominal_power, conversion_factor, alarm_period;
-std_msgs::String alarm_msg;
+ros::Subscriber battery_sub;
+ros::Subscriber fuse1_sub;
+ros::Subscriber fuse2_sub;
+ros::Subscriber fuse3_sub;
+ros::Subscriber fuse4_sub;
 
 
-vector<diagnostic_msgs::DiagnosticStatus> statuses;
-diagnostic_updater::DiagnosticStatusWrapper bat_status;
-diagnostic_updater::DiagnosticStatusWrapper fuse_status;
 
 bool fuse1, fuse2, fuse3, fuse4;
-double power;
+double voltage;
+double conversion_factor;
 
-void digitalCallback(const soem_beckhoff_drivers::DigitalMsg::ConstPtr& msg)
+void fuse1Callback(const std_msgs::Bool::ConstPtr& msg)
 {
-	fuse_status.message = "OK";
-	if (msg->values[0])
-	{
-		fuse_status.addf("Fuse RB", "broken");
-		fuse_status.level = 2;
-		fuse_status.message = "Fuse broken";
-	}
-	else
-		fuse_status.addf("Fuse RB", "correct");
-	if (msg->values[1])
-	{
-		fuse_status.addf("Fuse RF", "broken");
-		fuse_status.level = 2;
-		fuse_status.message = "Fuse broken";
-	}
-	else
-		fuse_status.addf("Fuse RF", "correct");
-	if (msg->values[2])
-	{
-		fuse_status.addf("Fuse LF", "broken");
-		fuse_status.level = 2;
-		fuse_status.message = "Fuse broken";
-	}
-	else
-		fuse_status.addf("Fuse LF", "correct");
-	if (msg->values[3])
-	{
-		fuse_status.addf("Fuse LB", "broken");
-		fuse_status.level = 2;
-		fuse_status.message = "Fuse broken";
-	}
-	else
-		fuse_status.addf("Fuse LB", "correct");
+	fuse1=msg->data;
 }
-void analogCallback(const soem_beckhoff_drivers::AnalogMsg::ConstPtr& msg)
+
+void fuse2Callback(const std_msgs::Bool::ConstPtr& msg)
 {
-	ROS_DEBUG("Battery value: %f", msg->values[0]);
-	power = msg->values[0];
-
-
-	bat_status.addf("Battery level", "%.2f", power*conversion_factor);
-
-	ROS_DEBUG("Battery value: %f", power);
-
-	alarm_msg.data = "";
-	alarm_state = false;
-	bat_status.level = 0;
-
-	std::stringstream ss;
-	ss << (double)((int)(power*conversion_factor*10))/10;
-	std::string sval = ss.str();
-	bat_status.message = sval;
-
-
-	if (power < low_power_margin_ch1) {
-		alarm_msg.data = string("Battery low");
-		alarm_state = true;
-		bat_status.level = 1;
-		bat_status.message = "Battery low ("+sval+" V)";
-	} else if (power > high_power_margin_ch1) {
-		alarm_msg.data = string("Power too high");
-		alarm_state = true;
-		bat_status.level = 1;
-		bat_status.message = "Power too high";
-	}
-
-	if (alarm_state) {
-		if (alarm_count == 0) {
-			time_init = ros::Time::now();
-		}
-		if (alarm_count < max_alarms) {
-			pub.publish(alarm_msg);
-			alarm_count++;
-		}
-	}
-
-	time_current = ros::Time::now();
-
-	if (alarm_state && (time_current.toSec()-time_init.toSec() > alarm_period)) {
-		alarm_count = 0;
-		alarm_state = false;
-		alarm_msg.data = "";
-	}
-
-
+	fuse2=msg->data;
 }
+
+void fuse3Callback(const std_msgs::Bool::ConstPtr& msg)
+{
+	fuse3=msg->data;
+}
+void fuse4Callback(const std_msgs::Bool::ConstPtr& msg)
+{
+	fuse4=msg->data;
+}
+
+void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
+{
+	voltage=msg->data*conversion_factor;
+}
+
+
+
 
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "battery_manager");
 	ros::NodeHandle n;
 
-	n.param<double> ("/battery_manager/low_power_margin_ch1", low_power_margin_ch1, 7.0);
-	n.param<double> ("/battery_manager/high_power_margin_ch1", high_power_margin_ch1, 9.0);
-	n.param<double> ("/battery_manager/low_power_margin_ch2", low_power_margin_ch2, 7.0);
-	n.param<double> ("/battery_manager/high_power_margin_ch2", high_power_margin_ch2, 9.0);
-	n.param<double> ("/battery_manager/nominal_power", nominal_power, 7.5);
-	n.param<double> ("/battery_manager/conversion_factor", conversion_factor, 3.0);
-	n.param<double> ("/battery_manager/alarm_period", alarm_period, 10.0);
-	n.param<int> ("/battery_manager/max_alarms", max_alarms, 3);
+	n.param<double> ("/battery_manager/conversion_factor", conversion_factor, 3.06);
 
-	analog_sub = n.subscribe("/analog_in", 1000, analogCallback);
-	digital_sub = n.subscribe("/digital_in", 1000, digitalCallback);
-	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
+	double max_voltage;
+	double warn_voltage;
+	double min_voltage;
+	n.param<double> ("/battery_manager/max_voltage", max_voltage, 27.0);
+	n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
+	n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
+
+
+	//	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
+
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
+
+
+	fuse1_sub = n.subscribe("/fuse1", 1, fuse1Callback);
+	fuse2_sub = n.subscribe("/fuse2", 1, fuse2Callback);
+	fuse3_sub = n.subscribe("/fuse3", 1, fuse3Callback);
+	fuse4_sub = n.subscribe("/fuse4", 1, fuse4Callback);
+	battery_sub = n.subscribe("/battery_value", 1, batteryCallback);
+
+	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
+	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
+
 
 	time_init = ros::Time::now();	
 
 	ros::Rate loop_rate(1.0);
 
-	bat_status.name = "Batteries";
-	fuse_status.name = "Fuses";
-
-	statuses.resize(2);
-
 	while(n.ok())
 	{
 		ros::spinOnce();
 
-		//statuses.push_back(status);
-		statuses[0]=bat_status;
-		statuses[1]=fuse_status;
+		ROS_DEBUG("Battery value: %f", voltage);
+		ROS_DEBUG("Fuses: %i %i %i %i", fuse1, fuse2, fuse3, fuse4);
 
+		// Calculate relative capacity
+		uint percentage = max(0.0,min(100.0,(-900.0+40.0*voltage)));
+		ROS_DEBUG("Capacity: %i", percentage);
+
+		// Create diagnostics
+		diagnostic_updater::DiagnosticStatusWrapper status;
+		status.message = "OK";
+		status.level = 0;
+		status.name = "Batteries";
+		status.add("Battery level", voltage);
+
+
+		// Determine warning status
+		if (voltage != 0.0)
+		{
+			if (voltage > max_voltage)
+			{
+				ROS_WARN("Voltage to high: %f V", voltage);
+				status.message = "Voltage to high!";
+				status.level = 1;
+			}
+			else if (voltage < min_voltage)
+			{
+				ROS_ERROR("Voltage seriously low: %f V", voltage);
+				status.message = "Voltage seriously low!";
+				status.level = 2;
+			}
+			else if (voltage < warn_voltage)
+			{
+				ROS_WARN("Power low: %f V", voltage);
+				status.message = "Voltage low!";
+				status.level = 1;
+			}
+		}
+		if (fuse1 || fuse2 || fuse3 || fuse4)
+		{
+			ROS_WARN("A fuse is broken!");
+			status.message = "A fuse is broken!";
+			status.level = 1;
+		}
+
+		// Publish diagnostics
+		vector<diagnostic_msgs::DiagnosticStatus> statuses;
+		statuses.push_back(status);
 		diagnostic_msgs::DiagnosticArray diag_msg;
 		diag_msg.status = statuses;
 		diag_msg.header.stamp = ros::Time::now();
-
 		diag_pub.publish(diag_msg);
 
-		bat_status.clear();
-		fuse_status.clear();
+
+		// Publish power state, used for dashboard
+		pr2_msgs::PowerState power_msg;
+		power_msg.header.stamp = ros::Time::now();
+		power_msg.relative_capacity = percentage;
+		power_msg.AC_present = false; //Unable to know
+		power_pub.publish(power_msg);
+
 		loop_rate.sleep();
 
 	}
