@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	double max_voltage;
 	double warn_voltage;
 	double min_voltage;
-	n.param<double> ("/battery_manager/max_voltage", max_voltage, 27.0);
+	n.param<double> ("/battery_manager/max_voltage", max_voltage, 30.0);
 	n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
 	n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
 
