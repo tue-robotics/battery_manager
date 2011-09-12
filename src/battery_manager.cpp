@@ -9,6 +9,7 @@ using namespace std;
 
 ros::Time time_init, time_current;
 ros::Publisher power_pub;
+ros::Publisher percentage_pub;
 ros::Publisher diag_pub;
 ros::Subscriber battery_sub;
 ros::Subscriber fuse1_sub;
@@ -76,6 +77,7 @@ int main(int argc, char **argv)
 	battery_sub = n.subscribe("/battery_value", 1, batteryCallback);
 
 	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
+	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
 
 
@@ -146,6 +148,11 @@ int main(int argc, char **argv)
 		power_msg.relative_capacity = percentage;
 		power_msg.AC_present = false; //Unable to know
 		power_pub.publish(power_msg);
+
+		std_msgs::Float32 perc_msg;
+		perc_msg.data = percentage;
+		percentage_pub.publish(perc_msg);
+
 
 		loop_rate.sleep();
 
