@@ -1,7 +1,8 @@
 #include "ros/ros.h"
 #include <std_msgs/Float32.h>
 #include <std_msgs/Bool.h>
-#include <pr2_msgs/PowerState.h>
+#include <std_msgs/String.h>
+//#include <pr2_msgs/PowerState.h>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
 
@@ -11,6 +12,7 @@ ros::Time time_init, time_current;
 ros::Publisher power_pub;
 ros::Publisher percentage_pub;
 ros::Publisher diag_pub;
+ros::Publisher speech_pub;
 ros::Subscriber battery_sub;
 ros::Subscriber fuse1_sub;
 ros::Subscriber fuse2_sub;
@@ -22,6 +24,7 @@ ros::Subscriber fuse4_sub;
 bool fuse1, fuse2, fuse3, fuse4;
 double voltage;
 double conversion_factor;
+string old_message;
 
 void fuse1Callback(const std_msgs::Bool::ConstPtr& msg)
 {
@@ -76,9 +79,10 @@ int main(int argc, char **argv)
 	fuse4_sub = n.subscribe("/fuse4", 1, fuse4Callback);
 	battery_sub = n.subscribe("/battery_value", 1, batteryCallback);
 
-	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
+//	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
 	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
+	speech_pub = n.advertise<std_msgs::String>("/amigo_speakup", 10);
 
 
 	time_init = ros::Time::now();	
@@ -103,7 +107,7 @@ int main(int argc, char **argv)
 		status.name = "Batteries";
 		status.add("Battery level", voltage);
 
-
+		string message = "";
 		// Determine warning status
 		if (voltage != 0.0)
 		{
@@ -111,18 +115,21 @@ int main(int argc, char **argv)
 			{
 				ROS_WARN("Voltage to high: %f V", voltage);
 				status.message = "Voltage to high!";
+				message = "My power is way to high, please do not fry my power circuits!";
 				status.level = 1;
 			}
 			else if (voltage < min_voltage)
 			{
 				ROS_ERROR("Voltage seriously low: %f V", voltage);
 				status.message = "Voltage seriously low!";
+				message = "I need new batteries now! No, not later, NOW!";
 				status.level = 2;
 			}
 			else if (voltage < warn_voltage)
 			{
 				ROS_WARN("Power low: %f V", voltage);
 				status.message = "Voltage low!";
+				message = "Please keep an eye on the batteries. Thank you.";
 				status.level = 1;
 			}
 		}
@@ -143,11 +150,20 @@ int main(int argc, char **argv)
 
 
 		// Publish power state, used for dashboard
-		pr2_msgs::PowerState power_msg;
-		power_msg.header.stamp = ros::Time::now();
-		power_msg.relative_capacity = percentage;
-		power_msg.AC_present = false; //Unable to know
-		power_pub.publish(power_msg);
+//		pr2_msgs::PowerState power_msg;
+//		power_msg.header.stamp = ros::Time::now();
+//		power_msg.relative_capacity = percentage;
+//		power_msg.AC_present = false; //Unable to know
+//		power_pub.publish(power_msg);
+
+		// Publish voice message if new
+		if (old_message != message)
+		{
+			std_msgs::String speech_msg;
+			speech_msg.data = message;
+			speech_pub.publish(speech_msg);
+			old_message = message;
+		}
 
 		std_msgs::Float32 perc_msg;
 		perc_msg.data = percentage;

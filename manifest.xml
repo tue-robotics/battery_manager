@@ -8,12 +8,9 @@
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/amigo_battery_manager</url>
-	<depend package="roscpp"/>
-    <depend package="amigo_msgs"/>
+    <depend package="roscpp"/>
     <depend package="std_msgs"/>
-    <depend package="soem_beckhoff_drivers"/>
     <depend package="diagnostic_updater"/>
-    <depend package="pr2_msgs"/>
 </package>
 
 
