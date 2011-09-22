@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 //	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
 	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
-	speech_pub = n.advertise<std_msgs::String>("/amigo_speakup", 10);
+	speech_pub = n.advertise<std_msgs::String>("/amigo_speak_up", 10);
 
 
 	time_init = ros::Time::now();	
