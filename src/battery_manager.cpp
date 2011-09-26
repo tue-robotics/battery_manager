@@ -63,9 +63,13 @@ int main(int argc, char **argv)
 	double max_voltage;
 	double warn_voltage;
 	double min_voltage;
+	double full;
+	double empty;
 	n.param<double> ("/battery_manager/max_voltage", max_voltage, 30.0);
 	n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
 	n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
+	n.param<double> ("/battery_manager/full_voltage", full, 27.0);
+	n.param<double> ("/battery_manager/empty_voltage", empty, 22.0);
 
 
 	//	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
@@ -97,7 +101,9 @@ int main(int argc, char **argv)
 		ROS_DEBUG("Fuses: %i %i %i %i", fuse1, fuse2, fuse3, fuse4);
 
 		// Calculate relative capacity
-		uint percentage = max(0.0,min(100.0,(-900.0+40.0*voltage)));
+		double slope = 1/(full-empty);
+		double offset = -slope*empty;
+		uint percentage = max(0.0,min(100.0,(slope*voltage+offset)));
 		ROS_DEBUG("Capacity: %i", percentage);
 
 		// Create diagnostics
@@ -147,14 +153,6 @@ int main(int argc, char **argv)
 		diag_msg.status = statuses;
 		diag_msg.header.stamp = ros::Time::now();
 		diag_pub.publish(diag_msg);
-
-
-		// Publish power state, used for dashboard
-//		pr2_msgs::PowerState power_msg;
-//		power_msg.header.stamp = ros::Time::now();
-//		power_msg.relative_capacity = percentage;
-//		power_msg.AC_present = false; //Unable to know
-//		power_pub.publish(power_msg);
 
 		// Publish voice message if new
 		if (old_message != message)
