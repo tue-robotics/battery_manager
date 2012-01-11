@@ -4,7 +4,7 @@
      amigo_battery_manager
 
   </description>
-  <author>Sava</author>
+  <author>Tim Clephas (original: Sava Marinkov)</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/amigo_battery_manager</url>
