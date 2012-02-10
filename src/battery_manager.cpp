@@ -48,6 +48,7 @@ void fuse4Callback(const std_msgs::Bool::ConstPtr& msg)
 void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
 {
 	voltage=msg->data*conversion_factor;
+	
 }
 
 
@@ -84,6 +85,8 @@ int main(int argc, char **argv)
 	battery_sub = n.subscribe("/battery_value", 1, batteryCallback);
 
 //	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
+	
+	
 	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
 	speech_pub = n.advertise<std_msgs::String>("/amigo_speak_up", 10);
@@ -102,9 +105,9 @@ int main(int argc, char **argv)
 
 		// Calculate relative capacity
 		double slope = 1/(full-empty);
-		double offset = -slope*empty;
-		uint percentage = max(0.0,min(100.0,(slope*voltage+offset)));
-		ROS_DEBUG("Capacity: %i", percentage);
+		double offset = -slope*empty; 
+		double capacity = max(0.0,min(100.0,(slope*voltage+offset)));
+		int percentage = 100*capacity;
 
 		// Create diagnostics
 		diagnostic_updater::DiagnosticStatusWrapper status;
