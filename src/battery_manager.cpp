@@ -146,6 +146,7 @@ int main(int argc, char **argv)
 		{
 			ROS_WARN("A fuse is broken!");
 			status.message = "A fuse is broken!";
+			message = "I am afraid that one of my fuses broke, can you please check it out";
 			status.level = 1;
 		}
 
