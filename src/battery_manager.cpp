@@ -108,6 +108,7 @@ int main(int argc, char **argv)
 		double offset = -slope*empty; 
 		double capacity = max(0.0,min(100.0,(slope*voltage+offset)));
 		int percentage = 100*capacity;
+		percentage = std::min(100,percentage);
 
 		// Create diagnostics
 		diagnostic_updater::DiagnosticStatusWrapper status;
