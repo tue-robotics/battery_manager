@@ -66,6 +66,8 @@ int main(int argc, char **argv)
 	double min_voltage;
 	double full;
 	double empty;
+	bool batterywaslow;
+	batterywaslow = false;
 	n.param<double> ("/battery_manager/max_voltage", max_voltage, 30.0);
 	n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
 	n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
@@ -141,7 +143,15 @@ int main(int argc, char **argv)
 				status.message = "Voltage low!";
 				message = "Please keep an eye on the batteries. Thank you.";
 				status.level = 1;
+				batterywaslow = true;
 			}
+			if (batterywaslow == true && (voltage > (warn_voltage*1.2))) {
+				message = "Hah haah haah ha,    that tickles!";
+				batterywaslow = false;
+				status.level = 1;
+			}
+			
+			
 		}
 		if (fuse1 || fuse2 || fuse3 || fuse4)
 		{
