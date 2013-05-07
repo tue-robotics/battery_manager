@@ -150,7 +150,26 @@ int main(int argc, char **argv)
 				status.level = 1;
 			}
 			if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
-				message = "Hah haah haah ha,    that tickles!";
+				
+				int sentence=rand()%4;
+				switch(sentence)
+				{
+				case 0:
+					message = "Hah haah haah ha,    that tickles!";
+					break;
+				case 1:
+					message = "Aaaah,    that feels so much better!";
+					break;
+				case 2:
+					message = "Yessss,	That's more like it!";
+					break;
+				case 3:
+					message = "Hmmm, 	this way I can go on for hours!";
+					break;
+				case 4:
+					message = "Yeah baby, 	You know exactly what I want! 	Rrrrrrr";
+					break;
+				}
 				belowticklevoltage = false;
 				status.level = 1;
 			}			
