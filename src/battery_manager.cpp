@@ -66,14 +66,15 @@ int main(int argc, char **argv)
 	double min_voltage;
 	double full;
 	double empty;
-	bool batterywaslow;
-	batterywaslow = false;
+	bool belowticklevoltage;
+	belowticklevoltage = false;
 	n.param<double> ("/battery_manager/max_voltage", max_voltage, 30.0);
 	n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
 	n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
 	n.param<double> ("/battery_manager/full_voltage", full, 27.0);
 	n.param<double> ("/battery_manager/empty_voltage", empty, 22.0);
-
+	double tickle_voltage;
+	tickle_voltage = 25.0;
 
 	//	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
 
@@ -130,6 +131,10 @@ int main(int argc, char **argv)
 				message = "My power is way to high, please do not fry my power circuits!";
 				status.level = 1;
 			}
+			else if (voltage < tickle_voltage)
+			{
+				belowticklevoltage = true;				
+			}
 			else if (voltage < min_voltage)
 			{
 				ROS_ERROR("Voltage seriously low: %f V", voltage);
@@ -143,14 +148,12 @@ int main(int argc, char **argv)
 				status.message = "Voltage low!";
 				message = "Please keep an eye on the batteries. Thank you.";
 				status.level = 1;
-				batterywaslow = true;
 			}
-			if (batterywaslow == true && (voltage > (warn_voltage*1.2))) {
+			if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
 				message = "Hah haah haah ha,    that tickles!";
-				batterywaslow = false;
+				belowticklevoltage = false;
 				status.level = 1;
-			}
-			
+			}			
 			
 		}
 		if (fuse1 || fuse2 || fuse3 || fuse4)
