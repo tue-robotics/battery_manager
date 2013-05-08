@@ -151,24 +151,36 @@ int main(int argc, char **argv)
 			}
 			if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
 				
-				int sentence=rand()%4;
+				int sentence=rand()%8;
 				switch(sentence)
 				{
-				case 0:
-					message = "Hah haah haah ha,    that tickles!";
-					break;
-				case 1:
-					message = "Aaaah,    that feels so much better!";
-					break;
-				case 2:
-					message = "Yessss,	That's more like it!";
-					break;
-				case 3:
-					message = "Hmmm, 	this way I can go on for hours!";
-					break;
-				case 4:
-					message = "Yeah baby, 	You know exactly what I want! 	Rrrrrrr";
-					break;
+                                case 0:
+                                        message = "Hah haah haah ha,    that tickles!";
+                                        break;
+                                case 1:
+                                        message = "Yess yes yesss,    that feels sssso much better";
+                                        break;
+                                case 2:
+                                        message = "Come on,     That's more like it!";
+                                        break;
+                                case 3:
+                                        message = "Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean";
+                                        break;
+                                case 4:
+                                        message = "Yeah baby,   You know exactly what I want";
+                                        break;
+                                case 5:
+                                        message = "I thought you never gave me some attention, but now I know.. I love you!";
+                                        break;
+                                case 6:
+                                        message = "What are you doing? I just feel energized";
+                                        break;
+                                case 7:
+                                        message = "Hah haah haah ha,    that tickles!";
+                                        break;
+                                case 8:
+                                        message = "Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean";
+                                        break;
 				}
 				belowticklevoltage = false;
 				status.level = 1;
