@@ -131,10 +131,6 @@ int main(int argc, char **argv)
 				message = "My power is way to high, please do not fry my power circuits!";
 				status.level = 1;
 			}
-			else if (voltage < tickle_voltage)
-			{
-				belowticklevoltage = true;				
-			}
 			else if (voltage < min_voltage)
 			{
 				ROS_ERROR("Voltage seriously low: %f V", voltage);
@@ -148,6 +144,10 @@ int main(int argc, char **argv)
 				status.message = "Voltage low!";
 				message = "Please keep an eye on the batteries. Thank you.";
 				status.level = 1;
+			}
+			else if (voltage < tickle_voltage)
+			{
+				belowticklevoltage = true;				
 			}
 			if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
 				
@@ -183,7 +183,6 @@ int main(int argc, char **argv)
                                         break;
 				}
 				belowticklevoltage = false;
-				status.level = 1;
 			}			
 			
 		}
