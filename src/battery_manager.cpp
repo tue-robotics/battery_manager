@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	double tickle_voltage;
 	tickle_voltage = 25.0;
 
-	//	pub = n.advertise<std_msgs::String>("/amigo_speak_up", 50);
+	//	pub = n.advertise<std_msgs::String>("/text_to_speech/input", 50);
 
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 	
 	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
-	speech_pub = n.advertise<std_msgs::String>("/amigo_speak_up", 10);
+	speech_pub = n.advertise<std_msgs::String>("/text_to_speech/input", 10);
 
 
 	time_init = ros::Time::now();	
