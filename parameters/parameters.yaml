@@ -7,3 +7,9 @@ battery_manager:
   conversion_factor: 3.29
   alarm_period: 60.0
   max_alarms: 3
+  fuse_subs:
+    - fuse1
+    - fuse2
+    - fuse3
+    - fuse4
+  battery_sub: battery_value

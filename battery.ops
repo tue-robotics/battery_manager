@@ -1,7 +1,0 @@
-import("amigo_battery_manager")
-loadComponent("ReadBattery","AMIGO::ReadBattery")
-ReadBattery.setPeriod(1.0);
-ReadBattery.configure
-connect ("Soem.Slave_100e.values","ReadBattery.in", ConnPolicy() )
-stream("ReadBattery.out",battery_ROStopics.battery)
-ReadBattery.start

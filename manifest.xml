@@ -1,13 +1,13 @@
 <package>
-  <description brief="amigo_battery_manager">
+  <description brief="battery_manager">
 
-     amigo_battery_manager
+     battery_manager
 
   </description>
   <author>Tim Clephas (original: Sava Marinkov)</author>
   <license>BSD</license>
   <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/amigo_battery_manager</url>
+  <url>http://ros.org/wiki/battery_manager</url>
     <depend package="roscpp"/>
     <depend package="std_msgs"/>
     <depend package="diagnostic_updater"/>

@@ -14,35 +14,19 @@ ros::Publisher percentage_pub;
 ros::Publisher diag_pub;
 ros::Publisher speech_pub;
 ros::Subscriber battery_sub;
-ros::Subscriber fuse1_sub;
-ros::Subscriber fuse2_sub;
-ros::Subscriber fuse3_sub;
-ros::Subscriber fuse4_sub;
+std::vector<ros::Subscriber> fuse_subs;
 
-
-
-bool fuse1, fuse2, fuse3, fuse4;
+bool fuse;
 double voltage;
 double conversion_factor;
 string old_message;
 
-void fuse1Callback(const std_msgs::Bool::ConstPtr& msg)
+void fuseCallback(const std_msgs::Bool::ConstPtr& msg)
 {
-	fuse1=msg->data;
-}
-
-void fuse2Callback(const std_msgs::Bool::ConstPtr& msg)
-{
-	fuse2=msg->data;
-}
-
-void fuse3Callback(const std_msgs::Bool::ConstPtr& msg)
-{
-	fuse3=msg->data;
-}
-void fuse4Callback(const std_msgs::Bool::ConstPtr& msg)
-{
-	fuse4=msg->data;
+    /// fuse variable is usually false, only copy data if something is wrong
+    if (msg->data) {
+        fuse = true;
+    }
 }
 
 void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
@@ -50,9 +34,6 @@ void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
 	voltage=msg->data*conversion_factor;
 	
 }
-
-
-
 
 int main(int argc, char **argv)
 {
@@ -76,19 +57,31 @@ int main(int argc, char **argv)
 	double tickle_voltage;
 	tickle_voltage = 25.0;
 
-	//	pub = n.advertise<std_msgs::String>("/text_to_speech/input", 50);
-
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 
+    /// Subscribers
+    std::string battery_topic_name;
+    n.param<std::string>("/battery_manager/battery_sub", battery_topic_name, "battery_value");
+    battery_topic_name = "/"+battery_topic_name;
+    battery_sub = n.subscribe(battery_topic_name, 1, batteryCallback);
 
-	fuse1_sub = n.subscribe("/fuse1", 1, fuse1Callback);
-	fuse2_sub = n.subscribe("/fuse2", 1, fuse2Callback);
-	fuse3_sub = n.subscribe("/fuse3", 1, fuse3Callback);
-	fuse4_sub = n.subscribe("/fuse4", 1, fuse4Callback);
-	battery_sub = n.subscribe("/battery_value", 1, batteryCallback);
+    XmlRpc::XmlRpcValue fuse_topic_names;
+    n.getParam("/battery_manager/fuse_subs", fuse_topic_names);
+    for (int32_t i = 0; i < fuse_topic_names.size(); ++i)
+    {
+      ROS_ASSERT(fuse_topic_names[i].getType() == XmlRpc::XmlRpcValue::TypeString);
+      std::string topic_name = "/"+static_cast<std::string>(fuse_topic_names[i]);
+      ros::Subscriber sub = n.subscribe(topic_name, 1, fuseCallback);
+      fuse_subs.push_back(sub);
+    }
 
-//	power_pub = n.advertise<pr2_msgs::PowerState>("/power_state", 1);
-	
+    //std::vector<std::string> fuse_topic_names;
+    //n.param<std::vector<std::string> >("/battery_manager/fuse_subs", fuse_topic_names);
+    //fuse1_sub = n.subscribe("/fuse1", 1, fuseCallback);
+    //fuse2_sub = n.subscribe("/fuse2", 1, fuseCallback);
+    //fuse3_sub = n.subscribe("/fuse3", 1, fuseCallback);
+    //fuse4_sub = n.subscribe("/fuse4", 1, fuseCallback);
+
 	
 	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
@@ -101,10 +94,11 @@ int main(int argc, char **argv)
 
 	while(n.ok())
 	{
+        fuse = false;
 		ros::spinOnce();
 
 		ROS_DEBUG("Battery value: %f", voltage);
-		ROS_DEBUG("Fuses: %i %i %i %i", fuse1, fuse2, fuse3, fuse4);
+        ROS_DEBUG("Fuses: %i", fuse);
 
 		// Calculate relative capacity
 		double slope = 1/(full-empty);
@@ -186,7 +180,7 @@ int main(int argc, char **argv)
 			}			
 			
 		}
-		if (fuse1 || fuse2 || fuse3 || fuse4)
+        if (fuse)
 		{
 			ROS_WARN("A fuse is broken!");
 			status.message = "A fuse is broken!";
