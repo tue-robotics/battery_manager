@@ -60,10 +60,9 @@ int main(int argc, char **argv)
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
 
     /// Subscribers
-    std::string battery_topic_name;
-    n.param<std::string>("/battery_manager/battery_sub", battery_topic_name, "battery_value");
-    battery_topic_name = "/"+battery_topic_name;
-    battery_sub = n.subscribe(battery_topic_name, 1, batteryCallback);
+    std::string battery_sub_topic_name;
+    n.param<std::string>("/battery_manager/battery_sub", battery_sub_topic_name, "/battery_value");
+    battery_sub = n.subscribe(battery_sub_topic_name, 1, batteryCallback);
 
     XmlRpc::XmlRpcValue fuse_topic_names;
     n.getParam("/battery_manager/fuse_subs", fuse_topic_names);
@@ -82,8 +81,9 @@ int main(int argc, char **argv)
     //fuse3_sub = n.subscribe("/fuse3", 1, fuseCallback);
     //fuse4_sub = n.subscribe("/fuse4", 1, fuseCallback);
 
-	
-	percentage_pub = n.advertise<std_msgs::Float32>("/battery_percentage", 1);
+	std::string battery_pub_topic_name;
+	n.param<std::string>("/battery_manager/battery_pub", battery_pub_topic_name, "/battery_percentage");
+	percentage_pub = n.advertise<std_msgs::Float32>(battery_pub_topic_name, 1);
 	diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
 	speech_pub = n.advertise<std_msgs::String>("/text_to_speech/input", 10);
 
