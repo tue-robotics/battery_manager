@@ -37,9 +37,10 @@ void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "battery_manager");
-  ros::NodeHandle n;
+  ros::NodeHandle n("~");
+  ros::NodeHandle gn;
 
-  n.param<double> ("/battery_manager/conversion_factor", conversion_factor, 3.06);
+  n.param<double> ("conversion_factor", conversion_factor, 3.06);
 
   double max_voltage;
   double warn_voltage;
@@ -48,41 +49,33 @@ int main(int argc, char **argv)
   double empty;
   bool belowticklevoltage;
   belowticklevoltage = false;
-  n.param<double> ("/battery_manager/max_voltage", max_voltage, 30.0);
-  n.param<double> ("/battery_manager/warn_voltage", warn_voltage, 23.0);
-  n.param<double> ("/battery_manager/min_voltage", min_voltage, 21.0);
-  n.param<double> ("/battery_manager/full_voltage", full, 27.0);
-  n.param<double> ("/battery_manager/empty_voltage", empty, 22.0);
+  n.param<double> ("max_voltage", max_voltage, 30.0);
+  n.param<double> ("warn_voltage", warn_voltage, 23.0);
+  n.param<double> ("min_voltage", min_voltage, 21.0);
+  n.param<double> ("full_voltage", full, 27.0);
+  n.param<double> ("empty_voltage", empty, 22.0);
   double tickle_voltage;
   tickle_voltage = 25.0;
 
-  diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 50);
-
-  /// Subscribers
-  std::string battery_sub_topic_name;
-  n.param<std::string>("/battery_manager/battery_sub", battery_sub_topic_name, "/battery_value");
-  battery_sub = n.subscribe(battery_sub_topic_name, 1, batteryCallback);
 
   XmlRpc::XmlRpcValue fuse_topic_names;
-  if (!n.getParam("/battery_manager/fuse_subs", fuse_topic_names)) {
-      ROS_ERROR("parameter /battery_manager/fuse_subs not found");
+  if (!n.getParam("fuse_subs", fuse_topic_names)) {
+      ROS_ERROR("parameter ~fuse_subs not found");
       return 0;
   }
 
   for (int32_t i = 0; i < fuse_topic_names.size(); ++i)
   {
     ROS_ASSERT(fuse_topic_names[i].getType() == XmlRpc::XmlRpcValue::TypeString);
-    std::string topic_name = "/"+static_cast<std::string>(fuse_topic_names[i]);
-    ros::Subscriber sub = n.subscribe(topic_name, 1, fuseCallback);
+    std::string topic_name = static_cast<std::string>(fuse_topic_names[i]);
+    ros::Subscriber sub = gn.subscribe(topic_name, 1, fuseCallback);
     fuse_subs.push_back(sub);
   }
 
-  std::string battery_pub_topic_name;
-  n.param<std::string>("/battery_manager/battery_pub", battery_pub_topic_name, "/battery_percentage");
-  percentage_pub = n.advertise<std_msgs::Float32>(battery_pub_topic_name, 1);
-  diag_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("/diagnostics", 1);
-  speech_pub = n.advertise<std_msgs::String>("/text_to_speech/input", 10);
-
+  battery_sub = gn.subscribe("battery_value", 1, batteryCallback);
+  percentage_pub = gn.advertise<std_msgs::Float32>("battery_percentage", 1);
+  diag_pub = gn.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 1);
+  speech_pub = gn.advertise<std_msgs::String>("text_to_speech/input", 10);
 
   time_init = ros::Time::now();
 
