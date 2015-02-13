@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
+#include <std_msgs/Float32MultiArray.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
@@ -28,9 +29,13 @@ void fuseCallback(const std_msgs::Bool::ConstPtr& msg)
   }
 }
 
-void batteryCallback(const std_msgs::Float32::ConstPtr& msg)
+void batteryCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
 {
-  voltage=msg->data*conversion_factor;
+  if (msg->data.size() <1 ) {
+      ROS_ERROR("battery_value, wrong data size!");
+      return ;
+  }
+  voltage=msg->data[0]*conversion_factor;
 
 }
 
