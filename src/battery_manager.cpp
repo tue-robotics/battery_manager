@@ -5,6 +5,7 @@
 #include <std_msgs/String.h>
 #include <diagnostic_updater/DiagnosticStatusWrapper.h>
 #include <diagnostic_msgs/DiagnosticArray.h>
+#include <time.h>
 
 using namespace std;
 
@@ -44,6 +45,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "battery_manager");
   ros::NodeHandle n("~");
   ros::NodeHandle gn;
+  /* initialize random seed: */
+  srand (time(NULL));
 
   n.param<double> ("conversion_factor", conversion_factor, 3.06);
 
@@ -138,38 +141,19 @@ int main(int argc, char **argv)
         belowticklevoltage = true;
       }
       if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
+        std::vector<std::string> sentences;
+        sentences.push_back("Hah haah haah ha,    that tickles!");
+        sentences.push_back("Yess yes yesss,    that feels sssso much better");
+        sentences.push_back("Come on,     That's more like it!");
+        sentences.push_back("Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean");
+        sentences.push_back("Yeah baby,   You know exactly what I want");
+        sentences.push_back("I thought you never gave me some attention, but now I know.. I love you!");
+        sentences.push_back("What are you doing? I just feel energized");
+        sentences.push_back("Please be gentle! I am sensitive down there");
+        sentences.push_back("Powerrr, Ultimate powerr!!");
 
-        int sentence=rand()%8;
-        switch(sentence)
-        {
-                case 0:
-                    message = "Hah haah haah ha,    that tickles!";
-                    break;
-                case 1:
-                    message = "Yess yes yesss,    that feels sssso much better";
-                    break;
-                case 2:
-                    message = "Come on,     That's more like it!";
-                    break;
-                case 3:
-                    message = "Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean";
-                    break;
-                case 4:
-                    message = "Yeah baby,   You know exactly what I want";
-                    break;
-                case 5:
-                    message = "I thought you never gave me some attention, but now I know.. I love you!";
-                    break;
-                case 6:
-                    message = "What are you doing? I just feel energized";
-                    break;
-                case 7:
-                    message = "Hah haah haah ha,    that tickles!";
-                    break;
-                case 8:
-                    message = "Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean";
-                    break;
-        }
+        message = sentences[rand() % sentences.size()];
+
         belowticklevoltage = false;
       }
 
