@@ -7,8 +7,6 @@
 #include <diagnostic_msgs/DiagnosticArray.h>
 #include <time.h>
 
-using namespace std;
-
 ros::Time time_init, time_current;
 ros::Publisher power_pub;
 ros::Publisher percentage_pub;
@@ -20,7 +18,8 @@ std::vector<ros::Subscriber> fuse_subs;
 bool fuse;
 double voltage;
 double conversion_factor;
-string old_message;
+std::string old_message;
+
 
 void fuseCallback(const std_msgs::Bool::ConstPtr& msg)
 {
@@ -65,6 +64,16 @@ int main(int argc, char **argv)
   double tickle_voltage;
   tickle_voltage = 25.0;
 
+  std::vector<std::string> sentences;
+  sentences.push_back("Hah haah haah ha,    that tickles!");
+  sentences.push_back("Yess yes yesss,    that feels sssso much better");
+  sentences.push_back("Come on,     That's more like it!");
+  sentences.push_back("Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean");
+  sentences.push_back("Yeah baby,   You know exactly what I want");
+  sentences.push_back("I thought you never gave me some attention, but now I know.. I love you!");
+  sentences.push_back("What are you doing? I just feel energized");
+  sentences.push_back("Please be gentle! I am sensitive down there");
+  sentences.push_back("Powerrr, Ultimate powerr!!");
 
   XmlRpc::XmlRpcValue fuse_topic_names;
   if (!n.getParam("fuse_subs", fuse_topic_names)) {
@@ -100,7 +109,7 @@ int main(int argc, char **argv)
     // Calculate relative capacity
     double slope = 1/(full-empty);
     double offset = -slope*empty;
-    double capacity = max(0.0,min(100.0,(slope*voltage+offset)));
+    double capacity = std::max(0.0,std::min(100.0,(slope*voltage+offset)));
     int percentage = 100*capacity;
     percentage = std::min(100,percentage);
 
@@ -111,7 +120,7 @@ int main(int argc, char **argv)
     status.name = "Batteries";
     status.add("Battery level", voltage);
 
-    string message = "";
+    std::string message = "";
     // Determine warning status
     if (voltage != 0.0)
     {
@@ -142,15 +151,6 @@ int main(int argc, char **argv)
       }
       if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
         std::vector<std::string> sentences;
-        sentences.push_back("Hah haah haah ha,    that tickles!");
-        sentences.push_back("Yess yes yesss,    that feels sssso much better");
-        sentences.push_back("Come on,     That's more like it!");
-        sentences.push_back("Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean");
-        sentences.push_back("Yeah baby,   You know exactly what I want");
-        sentences.push_back("I thought you never gave me some attention, but now I know.. I love you!");
-        sentences.push_back("What are you doing? I just feel energized");
-        sentences.push_back("Please be gentle! I am sensitive down there");
-        sentences.push_back("Powerrr, Ultimate powerr!!");
 
         message = sentences[rand() % sentences.size()];
 
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
     }
 
     // Publish diagnostics
-    vector<diagnostic_msgs::DiagnosticStatus> statuses;
+    std::vector<diagnostic_msgs::DiagnosticStatus> statuses;
     statuses.push_back(status);
     diagnostic_msgs::DiagnosticArray diag_msg;
     diag_msg.status = statuses;
