@@ -22,6 +22,18 @@ double voltage;
 double conversion_factor;
 string old_message;
 
+std::vector<std::string> sentences;
+sentences.push_back("Hah haah haah ha,    that tickles!");
+sentences.push_back("Yess yes yesss,    that feels sssso much better");
+sentences.push_back("Come on,     That's more like it!");
+sentences.push_back("Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean");
+sentences.push_back("Yeah baby,   You know exactly what I want");
+sentences.push_back("I thought you never gave me some attention, but now I know.. I love you!");
+sentences.push_back("What are you doing? I just feel energized");
+sentences.push_back("Please be gentle! I am sensitive down there");
+sentences.push_back("Powerrr, Ultimate powerr!!");
+
+
 void fuseCallback(const std_msgs::Bool::ConstPtr& msg)
 {
   /// fuse variable is usually false, only copy data if something is wrong
@@ -142,15 +154,6 @@ int main(int argc, char **argv)
       }
       if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
         std::vector<std::string> sentences;
-        sentences.push_back("Hah haah haah ha,    that tickles!");
-        sentences.push_back("Yess yes yesss,    that feels sssso much better");
-        sentences.push_back("Come on,     That's more like it!");
-        sentences.push_back("Oh yeah,     this way I can go on for hours,,,,,, if you know what I mean");
-        sentences.push_back("Yeah baby,   You know exactly what I want");
-        sentences.push_back("I thought you never gave me some attention, but now I know.. I love you!");
-        sentences.push_back("What are you doing? I just feel energized");
-        sentences.push_back("Please be gentle! I am sensitive down there");
-        sentences.push_back("Powerrr, Ultimate powerr!!");
 
         message = sentences[rand() % sentences.size()];
 
