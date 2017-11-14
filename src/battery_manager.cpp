@@ -65,7 +65,6 @@ int main(int argc, char **argv)
   tickle_voltage = 25.0;
 
   std::vector<std::string> sentences;
-
   sentences.push_back("Hah haah haah ha,    that tickles!");
   sentences.push_back("Yess yes yesss,    that feels sssso much better");
   sentences.push_back("Come on,     That's more like it!");
