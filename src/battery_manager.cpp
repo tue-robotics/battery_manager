@@ -75,7 +75,6 @@ int main(int argc, char **argv)
   sentences.push_back("Please be gentle! I am sensitive down there");
   sentences.push_back("Powerrr, Ultimate powerr!!");
 
-
   XmlRpc::XmlRpcValue fuse_topic_names;
   if (!n.getParam("fuse_subs", fuse_topic_names)) {
       ROS_ERROR("parameter ~fuse_subs not found");
