@@ -110,7 +110,7 @@ int main(int argc, char **argv)
     double slope = 1/(full-empty);
     double offset = -slope*empty;
     double capacity = std::max(0.0,std::min(100.0,(slope*voltage+offset)));
-    int percentage = 100*capacity;
+    int percentage = (int) 100.0*capacity;
     percentage = std::min(100,percentage);
 
     // Create diagnostics
@@ -150,8 +150,6 @@ int main(int argc, char **argv)
         belowticklevoltage = true;
       }
       if (belowticklevoltage == true && (voltage > (tickle_voltage*1.05))) {
-        std::vector<std::string> sentences;
-
         message = sentences[rand() % sentences.size()];
 
         belowticklevoltage = false;
@@ -175,7 +173,7 @@ int main(int argc, char **argv)
     diag_pub.publish(diag_msg);
 
     // Publish voice message if new
-    if (old_message != message)
+    if (old_message != message && message != "")
     {
       std_msgs::String speech_msg;
       speech_msg.data = message;
@@ -186,7 +184,6 @@ int main(int argc, char **argv)
     std_msgs::Float32 perc_msg;
     perc_msg.data = percentage;
     percentage_pub.publish(perc_msg);
-
 
     loop_rate.sleep();
 
