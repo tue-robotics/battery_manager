@@ -56,10 +56,10 @@ int main(int argc, char **argv)
   double empty;
   bool belowticklevoltage;
   belowticklevoltage = false;
-  n.param<double> ("max_voltage", max_voltage, 30.0);
+  n.param<double> ("max_voltage", max_voltage, 31.0);
   n.param<double> ("warn_voltage", warn_voltage, 23.0);
   n.param<double> ("min_voltage", min_voltage, 21.0);
-  n.param<double> ("full_voltage", full, 27.0);
+  n.param<double> ("full_voltage", full, 28.5);
   n.param<double> ("empty_voltage", empty, 22.0);
   double tickle_voltage;
   tickle_voltage = 25.0;
@@ -74,6 +74,7 @@ int main(int argc, char **argv)
   sentences.push_back("What are you doing? I just feel energized");
   sentences.push_back("Please be gentle! I am sensitive down there");
   sentences.push_back("Powerrr, Ultimate powerr!!");
+  sentences.push_back("What did the empty battery say to the judge, . , Please charge me!");
 
   XmlRpc::XmlRpcValue fuse_topic_names;
   if (!n.getParam("fuse_subs", fuse_topic_names)) {
