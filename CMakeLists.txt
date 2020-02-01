@@ -3,13 +3,14 @@ project(battery_manager)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  sensor_msgs
   std_msgs
   diagnostic_msgs
   diagnostic_updater
 )
 
 catkin_package(
-  CATKIN_DEPENDS roscpp std_msgs diagnostic_msgs diagnostic_updater
+  CATKIN_DEPENDS roscpp sensor_msgs std_msgs diagnostic_msgs diagnostic_updater
 )
 
 ###########
@@ -23,6 +24,12 @@ include_directories(
 add_executable(battery_manager src/battery_manager.cpp)
 add_dependencies(battery_manager ${catkin_EXPORTED_TARGETS})
 target_link_libraries(battery_manager
+  ${catkin_LIBRARIES}
+)
+
+add_executable(battery_manager_laptop src/battery_manager_laptop.cpp)
+add_dependencies(battery_manager_laptop ${catkin_EXPORTED_TARGETS})
+target_link_libraries(battery_manager_laptop
   ${catkin_LIBRARIES}
 )
 
