@@ -1,6 +1,5 @@
 #include <ros/ros.h>
-#include <std_msgs/Float32.h>
-#include <std_msgs/Float32MultiArray.h>
+#include <sensor_msgs/BatteryState.h>
 #include <std_msgs/String.h>
 
 
@@ -9,29 +8,28 @@ ros::Subscriber percentage_sub;
 
 double capacity;
 double charge;
-double percentage;
+uint8 percentage;
 
 
-void batteryCallback(const std_msgs::Float32MultiArray::ConstPtr& msg)
+void batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
 {
-    std:string location = "";
     if (msg.location == "hero2")
     {
-        capacity = msg.capacity
-        charge = msg.charge?
-        percentage = (charge/capacity)*100
+        capacity = msg.capacity;
+        charge = msg.charge;
+        percentage = (charge/capacity)*100;
     }
 }
 
 
 int main(int argc, char **argv)
 {
-    ros::init(arc, argv, "Battery_manager_laptop")
+    ros::init(arc, argv, "Battery_manager_laptop");
     ros::NodeHandle gn;
 
-    double middle = 50;
-    double low = 20;
-    double empty = 10;
+    uint8 middle = 50;
+    uint8 low = 20;
+    uint8 empty = 10;
     std::string message = "";
 
     battery_sub = gn.subscribe("battery", 1, batteryCallback);
@@ -42,17 +40,17 @@ int main(int argc, char **argv)
     while(gn.ok())
     {
         // check battery status
-        if (capacity < empty)
+        if (percentage < empty)
         {
-            message = "The laptop battery is empty, I need power now!"
+            message = "The laptop battery is empty, I need power now!";
         }
-        else if (capacity < low)
+        else if (percentage < low)
         {
-            message = "The laptop battery is almost empty, give me power."
+            message = "The laptop battery is almost empty, give me power.";
         }
-        else if (capacity < middle)
+        else if (percentage < middle)
         {
-            message = "The laptop battery is halfway empty, charge me if possible. "
+            message = "The laptop battery is halfway empty, charge me if possible.";
         }
 
         // publish voice message
