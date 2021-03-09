@@ -1,26 +1,24 @@
 <?xml version="1.0"?>
-<package>
-	<name>battery_manager</name>
-	<version>0.0.0</version>
-	<description>The battery_manager package</description>
+<?xml-model
+  href="http://download.ros.org/schema/package_format3.xsd"
+  schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>battery_manager</name>
+  <version>0.0.0</version>
+  <description>The battery_manager package</description>
 
-	<maintainer email="rayman747@hotmail.com">Ramon Wijnands</maintainer>
+  <maintainer email="rayman747@hotmail.com">Ramon Wijnands</maintainer>
 
-	<license>BSD</license>
+  <license>BSD</license>
 
-	<author email="t.t.g.clephas@alumnus.tue.nl">Tim Clephas</author>
-	<author email="tjay@cs.brown.edu">Ivana Bildbotz</author>
+  <author email="t.t.g.clephas@alumnus.tue.nl">Tim Clephas</author>
+  <author email="tjay@cs.brown.edu">Ivana Bildbotz</author>
 
-	<buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin</buildtool_depend>
 
-	<build_depend>roscpp</build_depend>
-	<build_depend>std_msgs</build_depend>
-	<build_depend>diagnostic_msgs</build_depend>
-	<build_depend>diagnostic_updater</build_depend>
-
-	<run_depend>roscpp</run_depend>
-	<run_depend>std_msgs</run_depend>
-	<run_depend>diagnostic_msgs</run_depend>
-	<run_depend>diagnostic_updater</run_depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>diagnostic_updater</depend>
 
 </package>
