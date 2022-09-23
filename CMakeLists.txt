@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(battery_manager)
 
+add_compile_options(-Wall -Werror=all)
+add_compile_options(-Wextra -Werror=extra)
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
